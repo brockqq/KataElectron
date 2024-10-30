@@ -2,12 +2,15 @@
   "name": "KataElectron",
   "version": "1.0.0",
   "description": "純粹測試",
-  "main": "index.js",
+  "main": "main.js",
   "repository": "https://github.com/brockqq/KataElectron.git",
   "author": "brock <brockqq@gmail.com>",
   "license": "MIT",
   "private": null,
   "devDependencies": {
     "electron": "^31.3.0"
+  },
+  "scripts": {
+    "start": "electron ."
   }
 }
