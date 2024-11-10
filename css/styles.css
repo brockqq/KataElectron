@@ -37,6 +37,15 @@ button:hover {
     background-color: #0056b3;
 }
 
+/* 清除預設的 list-style 和內邊距 */
+#monthlyServiceList {
+    list-style-type: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);  /* 設定每行顯示 3 個項目 */
+    gap: 20px;  /* 書籍之間的間隔 */
+}
+
 
 /* 清除預設的 list-style 和內邊距 */
 #bookList {

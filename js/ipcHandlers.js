@@ -36,11 +36,25 @@ async function handleGetMonthlyServiceData(event) {
     }
 }
 
+// 獲取月租館下所有書籍的處理函數
+async function handleMonthlyAllGrop(event, serviceCode) {
+    try {
+        const url = `${config.apiBaseUrl}${config.monthlyAllGrop}${serviceCode}`;
+        console.info(url);
+        const response = await axios.get(url);
+        return { success: true, books: response.data.ebooks };
+    } catch (error) {
+        console.error('取得月租館資料失敗', error);
+        return { success: false, message: '無法取得月租館資料' };
+    }
+}
 
 // 取得書籍處理函數
 async function handleGetBooks(event) {
     try {
+        console.info(`${config.apiBaseUrl}${config.getBooks}`);
         const response = await axios.get(`${config.apiBaseUrl}${config.getBooks}`);
+        console.info(response.data.ebooks);
         return { success: true, books: response.data.ebooks };
     } catch (error) {
         console.error('取得書籍失敗', error);
@@ -68,6 +82,7 @@ function registerIPC(mainWindow) {
     ipcMain.handle('login', handleLogin);
     ipcMain.handle('getBooks', handleGetBooks);
     ipcMain.handle('getMonthlyServiceData', handleGetMonthlyServiceData);
+    ipcMain.handle('getMonthlyServiceAllBook', handleMonthlyAllGrop); // 新增的 IPC 處理程序
     ipcMain.on('back-to-book-list', (event) => handleBackToBookList(event, mainWindow));
     ipcMain.on('book-detail', (event, book) => handleBookDeatil(event, book, mainWindow));
 }
