@@ -1,13 +1,112 @@
-<html>
-    <header>
-        <titlle>
-            Hello world!!
+<!DOCTYPE html>
+<html lang="en">
 
-        </titlle>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>書櫃</title>
+    <!-- 引用全域的 CSS 檔案 -->
+    <link rel="stylesheet" href="./css/styles.css">
+    <!-- const logger = require('./js/logger');  // 引入 logger  -->
+</head>
 
-        <body>
-            
-        </body>
+<body>
+    <div style="width:100%; height: 100%; display:none;">
+        <h1>登入</h1>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="帳號" required>
+            <input type="password" id="password" placeholder="密碼" required>
+            <button type="submit">登入</button>
+        </form>
+    </div>
+    <button id="fetchBooks" >取得書籍清單</button>
+    <ul id="bookList"></ul>
+    <!-- 顯示書籍詳細資料的區域 -->
+    <div id="bookDetail" style="display:none;">
+        <iframe id="bookDetailIframe" src="./html/bookDetail.html"
+            style="width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0;"></iframe>
+    </div>
 
-    </header>
+    <script>
+        const { ipcRenderer } = require('electron');
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const result = await ipcRenderer.invoke('login', username, password);
+            alert(result.message);
+
+            if (result.success) {
+                document.getElementById('fetchBooks').style.display = 'block';
+            }
+        });
+
+        document.getElementById('fetchBooks').addEventListener('click', async () => {
+            const result = await ipcRenderer.invoke('getBooks');
+            const bookList = document.getElementById('bookList');
+            bookList.innerHTML = '';
+
+            if (result.success) {
+                result.books.forEach((book) => {
+                    const li = document.createElement('li');
+                    li.classList.add('book-item');  // 為每個 li 添加 class 以便樣式化
+                    // 創建一個 <div> 容器，來包裹每個欄位
+                    const bookContent = document.createElement('div');
+                    bookContent.classList.add('book-content');
+
+                    const img = document.createElement('img');
+                    const imgurl = "https://img.mybook.momoshop.com.tw" + book.cover;
+                    img.src = imgurl || 'default-image.jpg';  // 使用預設圖片（default-image.jpg）如果沒有提供 imageUrl
+                    //img.alt = `Book Cover: ${book.deliverId}`;       // 設置圖片的 alt 屬性
+                    img.style.width = '100px';                        // 設置圖片大小，這裡設為 100px
+                    img.style.height = '150px';                       // 設置圖片高度
+
+                    img.addEventListener('click', () => {
+                        showBookDetail(book); // 顯示書籍詳細資料
+                    });
+                    // 創建並設置書名欄位
+                    const title = document.createElement('span');
+                    title.textContent = book.title || '無標題';
+                    title.classList.add('book-title');
+
+                    const purchaseDate = document.createElement('span');
+                    purchaseDate.textContent = book.purchaseDate || '無標題';
+                    purchaseDate.classList.add('book-purchaseDate');
+
+                    bookContent.appendChild(img);
+                    bookContent.appendChild(title);
+                    bookContent.appendChild(purchaseDate);
+
+                    // 把圖片元素添加到列表項中
+                    li.appendChild(bookContent);
+                    bookList.appendChild(li);
+                });
+            } else {
+                alert(result.message);
+            }
+        });
+        function showBookDetail(book) {
+            // 隱藏書籍列表，顯示書籍詳細區域
+            document.getElementById('bookList').style.display = 'none';
+            document.getElementById('bookDetail').style.display = 'block';
+            // 通知 iframe 顯示書籍詳細資料
+            const iframe = document.getElementById('bookDetailIframe');
+            iframe.contentWindow.postMessage({ type: 'show-book-detail', book: book }, '*');
+            //ipcRenderer.send('book-detail', book);
+        }
+
+        // 接收從書籍詳細頁返回書籍列表的請求
+        window.addEventListener('message', async (event) => {
+            if (event.data.type === 'back-to-book-list') {
+                document.getElementById('bookDetail').style.display = 'none';
+                document.getElementById('bookList').style.display = '';
+                document.getElementById('fetchBooks').style.display = '';
+                // 重新取得書籍清單
+                await getBooks();
+            }
+        });
+    </script>
+</body>
+
 </html>

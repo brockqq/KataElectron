@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>書籍詳細資料</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+    <h2>書籍詳細資料</h2>
+    <img id="bookCover" src="" alt="書籍封面" style="max-width: 200px;">
+    <p id="bookTitle"></p>
+    <p id="bookAuthor"></p>
+    <p id="bookDescription"></p>
+    <button id="backButton">返回書籍列表</button>
+
+    <script>
+        // 接收來自主頁的書籍資料並顯示
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'show-book-detail') {
+                const book = event.data.book;
+                console.log('接收到書籍詳細資料:', book);  // 調試輸出，確認是否接收到資料
+                document.getElementById('bookTitle').textContent = `標題: ${book.title}`;
+                document.getElementById('bookAuthor').textContent = `作者: ${book.author || '未知作者'}`;
+                document.getElementById('bookDescription').textContent = `描述: ${book.desc || '無描述'}`;
+                document.getElementById('bookCover').src = book.cover ? `https://img.mybook.momoshop.com.tw${book.cover}` : 'default-image.jpg';
+            }
+        });
+        // 返回書籍列表
+        document.getElementById('backButton').addEventListener('click', () => {
+            // 通知主頁返回書籍列表
+            window.parent.postMessage({ type: 'back-to-book-list' }, '*');
+        });
+        // const { ipcRenderer } = require('electron');
+        // // 接收來自主頁的書籍資料並顯示
+        // ipcRenderer.on('book-detail', (event, book) => {
+        //     console.log('接收到書籍詳細資料:', book);  // 調試輸出，確認是否接收到資料
+        //     document.getElementById('bookTitle').textContent = `標題: ${book.title}`;
+        //     document.getElementById('bookAuthor').textContent = `作者: ${book.author || '未知作者'}`;
+        //     document.getElementById('bookDescription').textContent = `描述: ${book.desc || '無描述'}`;
+        //     document.getElementById('bookCover').src = "https://img.mybook.momoshop.com.tw" + book.cover || 'default-image.jpg';
+        // });
+
+
+        // // 返回書籍列表
+        // document.getElementById('backButton').addEventListener('click', () => {
+        //     // 返回前一頁，通常可以用 window.history.back() 或 IPC 返回
+        //     ipcRenderer.send('back-to-book-list');
+        //     //window.history.back();
+        // });
+
+
+    </script>
+</body>
+
+</html>

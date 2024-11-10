@@ -1,0 +1,87 @@
+/* 全域樣式設定 */
+
+/* 設定背景色、字型等基本樣式 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 設定清單的樣式 */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+/* 設定按鈕的樣式 */
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+
+/* 清除預設的 list-style 和內邊距 */
+#bookList {
+    list-style-type: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);  /* 設定每行顯示 3 個項目 */
+    gap: 20px;  /* 書籍之間的間隔 */
+}
+
+/* 每本書的項目 */
+.book-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 圖片樣式 */
+.book-image {
+    max-width: 100%;
+    height: 180px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+/* 書名樣式 */
+.book-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* 作者樣式 */
+.book-author {
+    font-size: 14px;
+    color: #777;
+}
+
+/* 屏幕尺寸小於768px時，每行顯示1本書 */
+@media (max-width: 768px) {
+    #bookList {
+        grid-template-columns: 1fr;  /* 單列顯示 */
+    }
+}
