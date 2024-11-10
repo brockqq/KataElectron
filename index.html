@@ -61,7 +61,7 @@
 
             // 清空書籍列表
             monthlyServiceList.innerHTML = '';
-
+            
             if (result.success) {
                 result.books.forEach((book, index) => {
                     const li = document.createElement('li');
@@ -82,9 +82,9 @@
                             });
                     }
 
-                    const bookContent = document.createElement('div');
-                    bookContent.classList.add('book-content');
 
+                    const monthlyContent = document.createElement('div');
+                    monthlyContent.classList.add('book-content');
                     const img = document.createElement('img');
                     img.src = book.picUrlBig || 'default-image.jpg';
                     img.style.width = '100px';
@@ -96,10 +96,44 @@
                     title.classList.add('book-title');
 
 
-                    bookContent.appendChild(img);
-                    bookContent.appendChild(title);
+                    monthlyContent.appendChild(img);
+                    monthlyContent.appendChild(title);
 
-                    li.appendChild(bookContent);
+                    // 增加點擊事件到 monthlyContent（整個書籍項）
+                    monthlyContent.addEventListener('click', async () => {
+                        // 清除所有其他已選取項目的樣式
+                        const allItems = document.querySelectorAll('.book-item');
+                        allItems.forEach(item => {
+                            item.classList.remove('selected');
+                            item.style.border = 'none';
+                        });
+
+                        // 設置當前點擊的項目為已選取狀態
+                        li.classList.add('selected');
+                        li.style.border = '2px solid yellow';
+
+                        showLoading(); // 顯示載入提示
+                        try {
+                            // 調用 IPC 來獲取月租館下所有書籍
+                            const details = await ipcRenderer.invoke('getMonthlyServiceAllBook', book.serviceCode);
+                            if (details.success) {
+                                // 清空書籍列表並顯示月租館下的所有書籍
+                                const bookList = document.getElementById('bookList');
+                                bookList.innerHTML = '';
+                                appendBooks(details.books, 'monthly-detail'); // 顯示月租館下的所有書籍
+                            } else {
+                                alert(details.message);
+                            }
+                        } catch (error) {
+                            console.error("取得月租館下所有書籍時出現錯誤：", error);
+                            alert('無法取得月租館下所有書籍，請稍後重試。');
+                        } finally {
+                            hideLoading(); // 無論成功還是失敗，都隱藏載入提示
+                        }
+                    });
+
+
+                    li.appendChild(monthlyContent);
                     monthlyServiceList.appendChild(li);
                 });
 
