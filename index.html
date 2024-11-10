@@ -19,6 +19,7 @@
             <button type="submit">登入</button>
         </form>
     </div>
+    <button id="monthlyService" >月租館</button>
     <button id="fetchBooks" >取得書籍清單</button>
     <ul id="bookList"></ul>
     <!-- 顯示書籍詳細資料的區域 -->
@@ -26,7 +27,10 @@
         <iframe id="bookDetailIframe" src="./html/bookDetail.html"
             style="width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0;"></iframe>
     </div>
-
+    <div id="monthlyService" style="display:none;">
+        <iframe id="monthlyServiceIframe" src="./html/monthlyServices.html"
+            style="width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0;"></iframe>
+    </div>
     <script>
         const { ipcRenderer } = require('electron');
         document.getElementById('loginForm').addEventListener('submit', async (event) => {
@@ -41,6 +45,57 @@
                 document.getElementById('fetchBooks').style.display = 'block';
             }
         });
+
+    // 新增的按鈕 monthlyService 點擊處理
+    document.getElementById('monthlyService').addEventListener('click', async () => {
+        showLoading(); // 顯示載入提示
+
+        // 調用 API X 來取得月租館資料
+        const result = await ipcRenderer.invoke('getMonthlyServiceData');
+        const bookList = document.getElementById('bookList');
+
+        // 清空書籍列表
+        bookList.innerHTML = '';
+
+        if (result.success) {
+            result.books.forEach((book) => {
+                const li = document.createElement('li');
+                li.classList.add('book-item');
+
+                const bookContent = document.createElement('div');
+                bookContent.classList.add('book-content');
+
+                const img = document.createElement('img');
+                img.src = "https://img.mybook.momoshop.com.tw" + book.cover || 'default-image.jpg';
+                img.style.width = '100px';
+                img.style.height = '150px';
+
+                img.addEventListener('click', () => {
+                    showBookDetail(book);
+                });
+
+                const title = document.createElement('span');
+                title.textContent = book.title || '無標題';
+                title.classList.add('book-title');
+
+                const purchaseDate = document.createElement('span');
+                purchaseDate.textContent = book.purchaseDate || '無標題';
+                purchaseDate.classList.add('book-purchaseDate');
+
+                bookContent.appendChild(img);
+                bookContent.appendChild(title);
+                bookContent.appendChild(purchaseDate);
+
+                li.appendChild(bookContent);
+                bookList.appendChild(li);
+            });
+
+            hideLoading(); // 隱藏載入提示，顯示月租館書籍列表
+        } else {
+            alert(result.message);
+            hideLoading(); // 即使失敗也隱藏載入提示
+        }
+    });        
 
         document.getElementById('fetchBooks').addEventListener('click', async () => {
             const result = await ipcRenderer.invoke('getBooks');

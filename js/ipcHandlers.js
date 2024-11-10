@@ -25,6 +25,18 @@ async function handleLogin(event, username, password) {
     }
 }
 
+// 獲取月租館資料處理函數
+async function handleGetMonthlyServiceData(event) {
+    try {
+        const response = await axios.get(`${config.apiBaseUrl}${config.getMonthlyService}`);
+        return { success: true, books: response.data.monthlyService};
+    } catch (error) {
+        console.error('取得月租館資料失敗', error);
+        return { success: false, message: '無法取得月租館資料' };
+    }
+}
+
+
 // 取得書籍處理函數
 async function handleGetBooks(event) {
     try {
@@ -55,6 +67,7 @@ function handleBackToBookList(event, mainWindow) {
 function registerIPC(mainWindow) {
     ipcMain.handle('login', handleLogin);
     ipcMain.handle('getBooks', handleGetBooks);
+    ipcMain.handle('getMonthlyServiceData', handleGetMonthlyServiceData);
     ipcMain.on('back-to-book-list', (event) => handleBackToBookList(event, mainWindow));
     ipcMain.on('book-detail', (event, book) => handleBookDeatil(event, book, mainWindow));
 }
