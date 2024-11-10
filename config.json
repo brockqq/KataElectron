@@ -1,5 +1,0 @@
-{
-    "apiBaseUrl": "https://deliver.mybook.momoshop.com.tw",
-    "getBooks": "/DeliverWebV30/getBookCaseList?subId=MM_202202726299",
-    "imgUrl": "https://img.mybook.momoshop.com.tw"
-}
