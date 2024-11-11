@@ -198,10 +198,15 @@
                 title.textContent = book.title || '無標題';
                 title.classList.add('book-title');
 
+                const li2 = document.createElement('li');
+                li2.classList.add('book-item');
+                li2.classList.add(type);
+
+
                 bookContent.appendChild(img);
-                bookContent.appendChild(title);
+                li2.appendChild(title);
                 li.appendChild(bookContent);
-                bookList.appendChild(li);
+                bookList.appendChild(li).appendChild(l2);
             });
         }
 
