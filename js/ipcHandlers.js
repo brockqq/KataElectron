@@ -54,9 +54,14 @@ async function handleGetBooks(event) {
     try {
         console.info(`${config.apiBaseUrl}${config.getBooks}`);
         const response = await axios.get(`${config.apiBaseUrl}${config.getBooks}`);
+        console.info(response.data.ebooks[0].deliverId);
         return { success: true, books: response.data.ebooks };
     } catch (error) {
-        console.error('取得書籍失敗', error);
+        console.error('取得書籍失敗', {
+            message: error.message,
+            stack: error.stack,
+            response: error.response ? error.response.data : null
+        });
         return { success: false, message: '無法取得書籍清單' };
     }
 }

@@ -159,15 +159,14 @@
 
                 if (result.success) {
                     console.info("書籍數據：", result.books);  // 打印書籍數據以確認數據是否正確
-
                     // 清空書籍列表並追加新書籍
                     appendBooks(result.books, 'normal'); // 將普通書籍追加到書籍列表中
                 } else {
                     alert(result.message);
                 }
             } catch (error) {
-                console.error("取得書籍清單時出現錯誤：", error);
-                alert('無法取得書籍清單，請稍後重試。');
+                console.info("error",error.message);
+                alert('無法取得書籍清單，請稍後重試123123。'+error.message);
             } finally {
                 hideLoading(); // 無論請求成功與否，都隱藏載入提示
             }
@@ -199,14 +198,14 @@
                 title.classList.add('book-title');
 
                 const li2 = document.createElement('li');
-                li2.classList.add('book-item');
+                li.classList.add('book-item');
                 li2.classList.add(type);
 
 
                 bookContent.appendChild(img);
                 li2.appendChild(title);
                 li.appendChild(bookContent);
-                bookList.appendChild(li).appendChild(l2);
+                bookList.appendChild(li).appendChild(li2);
             });
         }
 
