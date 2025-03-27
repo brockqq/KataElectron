@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, dialog } = require('electron');
 const path = require('path');
 //const { handleLogin, handleGetBooks } = require('./js/ipcHandlers');  // 導入處理函數
 const { registerIPC } = require('./js/ipcHandlers'); // 引入已拆分的 ipcMain 處理邏輯
@@ -10,6 +10,7 @@ Menu.setApplicationMenu(null);
 
 let mainWindow;
 let deviceManagerWindow;
+let openEpubManagerWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -60,6 +61,63 @@ function openDeviceManager() {
   });
 }
 
+// 創建裝置管理視窗
+function openEpubManager() {
+    if (openEpubManagerWindow) {
+        openEpubManagerWindow.focus();
+        return;
+    }
+  
+    openEpubManagerWindow = new BrowserWindow({
+        width: 600,
+        height: 400,
+        title: '開啟書籍',
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        },
+    });
+  
+    openEpubManagerWindow.loadFile('openEpubManagerWindow.html');
+    openEpubManagerWindow.on('closed', () => {
+        openEpubManagerWindow = null;
+    });
+  }
+
+
+  //const path = require('path');
+
+  function createEpubJsWindow(epubPath) {
+    const epubWin = new BrowserWindow({
+      width: 1000,
+      height: 800,
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'), // ✅ 指定 preload
+        contextIsolation: true,                      // ✅ 必須 true 才能用 contextBridge
+        nodeIntegration: false                       // ✅ 安全起見，請關掉
+      },
+    });
+  
+    epubWin.loadFile('readers/epubjs/index.html');
+  
+    epubWin.webContents.once('did-finish-load', () => {
+      epubWin.webContents.send('open-epub', epubPath);
+    });
+  }
+
+// 處理開書 IPC
+ipcMain.handle('open-book', async () => {
+    const result = await dialog.showOpenDialog({
+        filters: [{ name: 'EPUB Books', extensions: ['epub'] }],
+        properties: ['openFile'],
+    });
+
+    if (!result.canceled && result.filePaths.length > 0) {
+        const epubPath = result.filePaths[0];
+        createEpubJsWindow(epubPath);
+    }
+});
+
 // 建立自訂選單
 const menuTemplate = [
   {
@@ -71,6 +129,10 @@ const menuTemplate = [
   {
       label: '裝置管理',
       click: openDeviceManager
+  },
+  {
+      label: '開啟書籍',
+      click: openEpubManager
   }
 ];
 
